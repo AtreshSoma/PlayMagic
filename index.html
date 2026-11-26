@@ -1,0 +1,99 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <title>AETHERIA · The Living Tapestry</title>
+  <meta name="description" content="A gesture-driven portal that turns your webcam into a living tapestry of light. Eyes, hands and face are the only controls.">
+  <meta name="theme-color" content="#05061a">
+  <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Ccircle cx='32' cy='32' r='30' fill='%2305061a'/%3E%3Cpath d='M32 8 L37 27 L56 32 L37 37 L32 56 L27 37 L8 32 L27 27Z' fill='%23f5c96a'/%3E%3C/svg%3E">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <!-- Loaded non-blocking so a slow font CDN never delays start-up (system fonts stand in meanwhile). -->
+  <link href="https://fonts.googleapis.com/css2?family=Sora:wght@400;500;600;700&family=Inter:wght@400;500;600&family=Great+Vibes&display=swap" rel="stylesheet" media="print" onload="this.media='all'">
+  <link rel="stylesheet" href="css/aetheria.css">
+</head>
+<body>
+  <!-- Hidden camera source. Frames are drawn (mirrored) onto #mirror and fed to MediaPipe. -->
+  <video id="cam" playsinline muted autoplay></video>
+
+  <!-- Render stack, bottom to top -->
+  <canvas id="tapestry" aria-hidden="true"></canvas>   <!-- WebGL silk-light shader -->
+  <canvas id="mirror" aria-hidden="true"></canvas>     <!-- Dimensional mirror (camera feed) -->
+  <canvas id="fx" aria-label="Aetheria interactive canvas"></canvas> <!-- particles, spells, games -->
+
+  <!-- Translucent DOM layer (glass widgets). Pointer events stay off except on overlays. -->
+  <div id="hud">
+    <!-- Home: the game library (built by js/scenes/hub.js). Visible only on the Home scene. -->
+    <main id="home" aria-label="Home" inert></main>
+
+    <div id="toast" role="status" aria-live="polite"></div>
+
+    <!-- One short, contextual instruction at a time (or a "try this" suggestion). -->
+    <div id="coach" class="glass empty" aria-live="polite"><span class="coach-icon"></span><span class="coach-text"></span></div>
+
+    <!-- "New magic discovered" moment -->
+    <div id="celebrate" aria-live="polite">
+      <div class="cel-icon"></div>
+      <div class="cel-kicker">NEW MAGIC DISCOVERED</div>
+      <div class="cel-name"></div>
+      <div class="cel-count"></div>
+    </div>
+
+    <!-- Live gesture status pill: tracking dots + the gesture recognised right now -->
+    <div id="pill" class="pill" role="status" aria-live="off"></div>
+
+    <!-- Home button, top-left, in every game and the tutorial (js/ui/back.js) -->
+    <button id="back" type="button" class="back" aria-label="Go Home" tabindex="-1" aria-hidden="true"></button>
+
+    <!-- Floating dock: navigation, overlays, camera / sound toggles, Kids Realm -->
+    <nav id="dock" class="dock" aria-label="Main"></nav>
+
+    <!-- Peace-sign snapshot thumbnail (pinch / click to save) -->
+    <figure id="snap" hidden><figcaption>Pinch to save</figcaption></figure>
+
+    <aside id="astrolabe" aria-label="Celestial and mood resonance astrolabe">
+      <canvas id="astro-canvas" width="264" height="264"></canvas>
+      <div class="astro-info">
+        <div class="astro-moon" id="astro-moon">—</div>
+        <div class="astro-line" id="astro-line">—</div>
+        <div class="astro-detail" id="astro-detail"></div>
+      </div>
+    </aside>
+
+    <section id="ritual" class="glass" hidden>
+      <div class="ritual-step" id="ritual-step"></div>
+      <div class="ritual-body">
+        <div class="ritual-icon" id="ritual-icon"></div>
+        <div>
+          <h2 id="ritual-title"></h2>
+          <p id="ritual-text"></p>
+          <p class="ritual-alt" id="ritual-alt"></p>
+        </div>
+      </div>
+      <div class="ritual-pips" id="ritual-pips"></div>
+    </section>
+
+    <section id="grimoire" class="overlay" hidden aria-label="Spellbook"></section>
+    <section id="hall" class="overlay" hidden aria-label="Leaderboard"></section>
+    <section id="settings" class="overlay" hidden aria-label="Settings"></section>
+    <section id="help" class="overlay" hidden aria-label="How to play"></section>
+  </div>
+
+  <!-- Hand / mouse pointer, drawn above every HTML panel -->
+  <canvas id="pointer" aria-hidden="true"></canvas>
+
+  <!-- Boot / fatal messages (shown only when something prevents start-up) -->
+  <div id="boot" hidden></div>
+
+  <script>
+    // ES modules cannot load from file:// — explain how to serve the folder instead of failing silently.
+    if (location.protocol === 'file:') {
+      var b = document.getElementById('boot');
+      b.hidden = false;
+      b.innerHTML = '<h1>AETHERIA needs a local server</h1><p>Browsers block ES modules and the camera on <code>file://</code>. From this folder run:</p><pre>python3 -m http.server 8000</pre><p>then open <a href="http://localhost:8000">http://localhost:8000</a>.</p>';
+    }
+  </script>
+  <script type="module" src="js/main.js"></script>
+</body>
+</html>

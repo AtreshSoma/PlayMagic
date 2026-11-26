@@ -1,0 +1,112 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <script>
+    // All asset paths are relative, so the URL must end in "/" (".../wonderland/").
+    // Some static servers serve ".../wonderland" without redirecting; fix that first.
+    if (!/\/$|\.html$/.test(location.pathname)) location.replace(location.pathname + '/' + location.search + location.hash);
+  </script>
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover, user-scalable=no">
+  <title>Wonderland Portal</title>
+  <meta name="description" content="A storybook world for children, played with hands, faces, blinks and nods. The camera is processed only on this device.">
+  <meta name="theme-color" content="#140a38">
+  <meta name="referrer" content="no-referrer">
+  <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Cdefs%3E%3CradialGradient id='g' cx='.35' cy='.3'%3E%3Cstop offset='0' stop-color='%23fff'/%3E%3Cstop offset='.6' stop-color='%23ff9ee6'/%3E%3Cstop offset='1' stop-color='%237a5cff'/%3E%3C/radialGradient%3E%3C/defs%3E%3Ccircle cx='32' cy='32' r='29' fill='url(%23g)'/%3E%3Cpath d='M32 14l4.5 11.5L48 30l-11.5 4.5L32 46l-4.5-11.5L16 30l11.5-4.5z' fill='%23fff'/%3E%3C/svg%3E">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <!-- Rounded display font. Optional: rounded system fonts stand in when offline. -->
+  <link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@500;600;700&family=Great+Vibes&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="css/wonderland.css">
+</head>
+<!--
+  data-exit-url: where the grown-up "Leave the portal" button goes.
+  Set it to your host app's route (same-origin), or remove it to hide the button.
+-->
+<body data-exit-url="../">
+  <!-- Camera source. Never shown directly and never uploaded: frames are drawn
+       (mirrored) onto the canvas and fed to on-device MediaPipe models. -->
+  <video id="cam" playsinline muted autoplay aria-hidden="true"></video>
+
+  <canvas id="stage" role="img" aria-label="Wonderland Portal play area. Children play with hand movements, facial expressions, touch or the mouse."></canvas>
+
+  <!-- Home: the world picker (built by js/modes/hub.js), shown only on the Home scene. -->
+  <main id="home" aria-label="Wonderland home" inert></main>
+
+  <!-- Sparkle cursors, picture coach and transitions draw here, above Home. -->
+  <canvas id="overlay" aria-hidden="true"></canvas>
+
+  <!-- Grown-up corner: press and hold for 1.5 seconds. -->
+  <button id="parent-btn" type="button" aria-label="Grown-up settings. Press and hold to open." aria-haspopup="dialog" aria-controls="parent-panel">
+    <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 2.5a4.5 4.5 0 0 0-4.5 4.5v2.5H7a2 2 0 0 0-2 2v8a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2v-8a2 2 0 0 0-2-2h-.5V7A4.5 4.5 0 0 0 12 2.5zm-2.5 4.5a2.5 2.5 0 0 1 5 0v2.5h-5zm2.5 7a1.5 1.5 0 0 1 .75 2.8V18h-1.5v-1.2A1.5 1.5 0 0 1 12 14z"/></svg>
+  </button>
+
+  <div id="parent-panel" role="dialog" aria-modal="true" aria-labelledby="pp-title" hidden>
+    <div class="pp-card">
+      <header>
+        <h2 id="pp-title">Grown-up settings</h2>
+        <button id="pp-close" type="button" class="pp-close" aria-label="Close settings">&times;</button>
+      </header>
+
+      <section class="pp-row">
+        <div class="pp-label">
+          <label for="pp-sound">Sound</label>
+          <span class="pp-hint">All sounds are made in the browser and kept soft.</span>
+        </div>
+        <input id="pp-sound" type="checkbox" class="pp-switch" role="switch">
+      </section>
+
+      <section class="pp-row">
+        <div class="pp-label"><label for="pp-volume">Volume</label></div>
+        <input id="pp-volume" type="range" min="0" max="100" step="1">
+      </section>
+
+      <section class="pp-row">
+        <div class="pp-label">
+          <label for="pp-mirror">Camera mirror</label>
+          <span class="pp-hint">How visible your child is inside the world. <output id="pp-mirror-out" for="pp-mirror"></output></span>
+        </div>
+        <input id="pp-mirror" type="range" min="0" max="100" step="1">
+      </section>
+
+      <fieldset class="pp-row pp-seg">
+        <legend class="pp-label">Play with</legend>
+        <div class="pp-seg-opts">
+          <input type="radio" name="pp-input" id="pp-input-camera" value="camera"><label for="pp-input-camera">Camera + touch</label>
+          <input type="radio" name="pp-input" id="pp-input-touch" value="touch"><label for="pp-input-touch">Touch / mouse only</label>
+        </div>
+      </fieldset>
+
+      <p id="pp-cam-status" class="pp-status" aria-live="polite"></p>
+
+      <p class="pp-privacy">
+        Privacy: hand and face tracking runs entirely in this browser. Camera images are never recorded,
+        stored or sent anywhere. Only these settings are saved, on this device.
+      </p>
+
+      <details class="pp-keys">
+        <summary>Keyboard shortcuts for testing</summary>
+        <p>Space blink · ←/→ steer · W nod · S shake · 1 open mouth (hold) · 2 smile (hold) · 3 raise brows · C clear the sky · Esc home</p>
+      </details>
+
+      <footer>
+        <a id="pp-exit" class="pp-exit" hidden>Leave the portal</a>
+        <button id="pp-done" type="button" class="pp-done">Back to play</button>
+      </footer>
+    </div>
+  </div>
+
+  <div id="boot" hidden></div>
+  <noscript><div id="boot-noscript">Wonderland Portal needs JavaScript turned on.</div></noscript>
+
+  <script>
+    // ES modules and the camera don't work from file:// — explain instead of failing silently.
+    if (location.protocol === 'file:') {
+      var b = document.getElementById('boot');
+      b.hidden = false;
+      b.innerHTML = '<h1>Wonderland Portal needs a local server</h1><p>Browsers block modules and the camera on <code>file://</code>. From the project folder run:</p><pre>python3 -m http.server 8000</pre><p>then open <a href="http://localhost:8000/wonderland/">http://localhost:8000/wonderland/</a></p>';
+    }
+  </script>
+  <script type="module" src="js/main.js"></script>
+</body>
+</html>

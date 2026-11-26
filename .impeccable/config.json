@@ -1,0 +1,29 @@
+{
+  "detector": {
+    "ignoreRules": [],
+    "ignoreFiles": [],
+    "ignoreValues": [
+      {
+        "rule": "dark-glow",
+        "value": "*",
+        "files": [
+          "index.html"
+        ],
+        "createdAt": "2026-11-25T14:48:40.390Z",
+        "reason": "Brief explicitly specifies luminous/bioluminescent glowing orbs, runes and light streams as the core aesthetic"
+      },
+      {
+        "rule": "bounce-easing",
+        "value": "cubic-bezier(.34, 1.56, .64, 1)",
+        "createdAt": "2026-11-25T18:30:25.436Z",
+        "reason": "User brief: 'smooth spring-physics transitions between views'; this is a mild back-out spring overshoot used for the dock, pill and toasts"
+      },
+      {
+        "rule": "bounce-easing",
+        "value": "var(--spring)",
+        "createdAt": "2026-11-25T18:30:25.460Z",
+        "reason": "User brief: 'smooth spring-physics transitions between views'; --spring is the mild back-out spring token"
+      }
+    ]
+  }
+}
