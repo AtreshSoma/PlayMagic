@@ -505,7 +505,13 @@ body[data-scene="hub"] #toast { top: auto; bottom: 100px; }
 }
 .det-alt { margin: var(--s-3) 0 0; padding: 12px 14px; border-radius: var(--r-sm); background: rgba(255,255,255,.04); border: 1px solid rgba(255,255,255,.07); font-size: 13px; line-height: 1.45; color: var(--ink-dim); }
 .det-alt-k { display: block; margin-bottom: 3px; font: 600 10.5px/1.2 var(--font-ui); letter-spacing: .12em; text-transform: uppercase; color: var(--ink-faint); }
-.det-actions { margin-top: auto; padding-top: var(--s-4); display: flex; align-items: center; gap: var(--s-5); }
+/* Play stays pinned under the scrolling steps, so it is never below the fold */
+.det-foot { flex: 0 0 auto; padding: 14px 24px 16px; border-top: var(--hairline); background: linear-gradient(180deg, rgba(255,255,255,.03), rgba(0,0,0,.08)); }
+.det-actions { display: flex; align-items: center; gap: var(--s-5); }
+.det-body::-webkit-scrollbar, .grid::-webkit-scrollbar { width: 8px; }
+.det-body::-webkit-scrollbar-thumb, .grid::-webkit-scrollbar-thumb { background: rgba(255,255,255,.18); border-radius: 8px; }
+.det-body::-webkit-scrollbar-track, .grid::-webkit-scrollbar-track { background: transparent; }
+.det-body { scrollbar-color: rgba(255,255,255,.2) transparent; }
 .btn-play {
   --acc: var(--accent);
   height: 54px; padding: 0 30px 0 24px; font-size: 16px; letter-spacing: .01em;
@@ -583,6 +589,7 @@ body[data-scene="hub"] #toast { top: auto; bottom: 100px; }
   .home-actions .btn { padding: 0 12px; }
   .home-actions .btn[data-act="help"] .lbl { display: none; }
   .det-body { padding: 16px 18px; }
+  .det-foot { padding: 12px 18px 14px; }
   .det-actions { gap: var(--s-4); }
   .grid { grid-template-columns: 1fr; }
   .card { min-height: 74px; }

@@ -36,7 +36,7 @@ Modelled on visionOS: your pointer **snaps magnetically** to the nearest button 
 - **Floating dock** (bottom centre): Home, Spellbook, Leaderboard, Settings, **How to play**, camera on/off, sound, Kids Realm.
 - **How to play** (dock **?** button, or the **?** key): the basics, every easy gesture with its keyboard twin, and each game's controls. It opens by itself the first time you reach Home. It rests dimmed and wakes as your hand or mouse comes near. During a game, hands must *pinch-hold* a dock button so a stray pinch never quits a round. Tab + Enter work for keyboard users.
 - **Gesture status pill** (top centre): two dots show whether the camera sees a hand and a face, and the label lights up with the gesture recognised right now ("Pinch", "Peace", "Left Wink", "Head Tilt").
-- **3-second onboarding**: every game opens with looping animated pictures of the moves (plus keycaps for keyboard players), and no text to read. Pinch, click, thumbs up, nod or Enter starts at once.
+- **3-second onboarding**: every game opens with looping animated pictures of the moves (plus keycaps for keyboard players), and no text to read. Camera-only moves (head tilt, two palms) are left out for mouse players. Pinch, click, thumbs up, nod, Space or Enter starts at once; an ordinary eye blink never skips it.
 - **Camera toggle**: turn the camera off or on at any time from the dock. Everything keeps working with the mouse, keys and touch.
 
 ### The only controls you need
@@ -75,7 +75,7 @@ Motion games (new):
 - **Neon Rails** (full-body runner): dash along three rail lines through a neon city. **Step left/right** to switch lines and dodge trains, **jump** over low barriers, **crouch** to slide under high bars. A 1.2-second calibration learns where you stand, and a small body panel shows how the camera reads you. Collect coins (every 50 raises the multiplier), Hoverboards (shield + double score) and Coin Magnets. Without a camera: ← → ↑ ↓ / Space, or swipe with the mouse or a finger.
 - **Sky Kingdom** (platformer): guide Lumo across floating sky islands to the rainbow gate. Your hand is an **air joystick** (right of centre runs right; an on-screen ring shows it), **flick up** to jump (again in the air to double jump). Stomp Grumbles, bump crystal blocks for coins, Star Seeds (grow big) and Spark Wands (✌ throws sparks). Each world gets longer. Keys: ← → run, ↑ / Space jump, P spark.
 - **Nebula Rally** (kart racer): three laps against five rivals on a neon space track. Hold **both hands like a steering wheel** and turn them (the on-screen wheel turns with you). The kart accelerates by itself; pinch or ✌ uses items (Comet Boost, Star Shield, Spark). Keys: ← → steer, Space item.
-- **Comet Keeper** (block and dodge): put a palm on each glowing ring as its comet lands, use both hands for golden comets, and move your head out of the way of dark meteors.
+- **Comet Keeper** (block and dodge): put a palm on each glowing ring as its comet lands, use both hands for golden comets, and move your head out of the way of dark meteors. The first 8 seconds are a warm-up: misses show a hint instead of costing a light.
 
 New, fast and easy to pick up:
 

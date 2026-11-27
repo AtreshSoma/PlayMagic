@@ -54,7 +54,7 @@ export class RallyGame extends GameBase {
     super('rally', 'Nebula Rally');
     this.duration = Infinity; this.maxLives = 0;
     this.allow = { swipe: false, runes: false, faceMagic: false, chimes: false, overlays: true, scatter: false, snapshot: false, gravity: false, puff: false, tilt: false, barrier: false, doubleBlink: false };
-    this.cues = [{ cue: 'twoPalms', key: '← →' }, { cue: 'tiltHand', key: 'Mouse' }, { cue: 'pinch', key: 'Space' }];
+    this.cues = [{ cue: 'twoPalms', key: '← →' }, { cue: 'tiltHand', cam: true }, { cue: 'pinch', key: 'Space' }];
     this.segs = buildTrack();
     this.trackLen = this.segs.length * SEG;
   }
@@ -78,14 +78,16 @@ export class RallyGame extends GameBase {
 
   // ------------------------------------------------------------------ input
   readSteer() {
+    // Small dead zone: hands held a little uneven (very common for kids) drive straight instead of drifting.
+    const dead = (v) => (Math.abs(v) < 0.12 ? 0 : Math.sign(v) * (Math.abs(v) - 0.12) / 0.88);
     const inp = app.input, fb = inp.fb, W = app.W;
     const hands = inp.hands.filter((h) => h.present);
     this.wheelHands = hands.length >= 2;
     if (hands.length >= 2) {
       const [L, R] = hands[0].palmX < hands[1].palmX ? hands : [hands[1], hands[0]];
-      return clamp(Math.atan2(R.palmY - L.palmY, R.palmX - L.palmX) / 0.6, -1, 1);
+      return dead(clamp(Math.atan2(R.palmY - L.palmY, R.palmX - L.palmX) / 0.6, -1, 1));
     }
-    if (hands.length === 1) return clamp((hands[0].palmX - W / 2) / (W * 0.25), -1, 1);
+    if (hands.length === 1) return dead(clamp((hands[0].palmX - W / 2) / (W * 0.25), -1, 1));
     const kd = (fb.held('ArrowRight') || fb.held('KeyD') ? 1 : 0) - (fb.held('ArrowLeft') || fb.held('KeyA') ? 1 : 0);
     if (kd) return kd;
     if (inp.mouseHand.present && app.t - fb.lastMove < 2) return clamp((inp.mouseHand.x - W / 2) / (W * 0.3), -1, 1);

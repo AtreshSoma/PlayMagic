@@ -72,6 +72,8 @@ export class HubScene {
             <h3 class="det-h" id="det-steps-h">How to play</h3>
             <ol class="det-steps" aria-labelledby="det-steps-h"></ol>
             <p class="det-alt"><span class="det-alt-k"></span><span class="det-alt-v"></span></p>
+          </div>
+          <div class="det-foot">
             <div class="det-actions">
               <button type="button" class="btn btn-play" data-act="play"><i class="btn-ring" aria-hidden="true"></i>${SVG.play}<span class="lbl">Play</span></button>
               <div class="det-best"><span class="det-best-k">Best</span><b class="det-best-v"></b></div>

@@ -56,6 +56,7 @@ export function drawFriend(ctx, kind, s, { t = 0, happy = 0, blink = false } = {
 export class BoopMode {
   constructor() {
     this.palette = 'boop';
+    this.coachAt = 'top'; // the bottom row of holes sits where the coach card would
     this.scenery = { islands: false, clouds: true };
     this.home = homeBubble(icon.home);
     this.ui = [this.home];

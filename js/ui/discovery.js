@@ -37,7 +37,7 @@ export function discover(id) {
   if (isFound(id) || !MAGICS.some((m) => m.id === id)) return;
   found().push(id);
   app.store.save();
-  if (app.scenes.name === 'initiation' || app.scenes.name === 'hub') return; // recorded quietly: the tutorial has its own moments, and Home stays calm
+  if (['intro', 'calibration', 'initiation', 'hub'].includes(app.scenes.name) || app.scenes.trans) return; // recorded quietly: the start click, tutorial and Home stay calm
   const sc = app.scenes.current;
   if (sc?.isGame && sc.state === 'play') return; // never pop a card over live gameplay
   const m = MAGICS.find((x) => x.id === id);

@@ -2,7 +2,7 @@
 // Shared game scaffolding.
 //   intro    3-second visual-only onboarding: animated gesture signifiers
 //            (plus keycaps for keyboard players) and a radial countdown ring.
-//            Pinch, click, thumbs up, nod, blink or Enter starts at once.
+//            Pinch, click, thumbs up, nod, Space or Enter starts at once.
 //   play     score / combo / lives / time HUD (kept to the top edge)
 //   results  glass panel with Play again / Home orbs. Thumbs up (or Enter) plays
 //            again; a head shake goes back Home.
@@ -24,7 +24,10 @@ export const ONBOARD_SECONDS = 3;
 export const HUD_Y = 58;
 /** Baseline for a game's own small status line under the score. */
 export const HUD_SUB_Y = HUD_Y + 84;
-const START_EVENTS = new Set(['thumbsUp', 'nod', 'blink']);
+/** Combo callouts sit below the score, chain line and each game's status line, never on top of them. */
+const comboY = () => Math.max(app.H * 0.22, HUD_SUB_Y + 58);
+// A natural camera blink happens every few seconds, so only the keyboard's Space "blink" starts a round.
+const START_EVENTS = new Set(['thumbsUp', 'nod']);
 
 export class GameBase {
   constructor(id, title) {
@@ -59,7 +62,9 @@ export class GameBase {
   playCoach() { return null; }
   coach() {
     if (this.state === 'intro') return null; // onboarding is visual-only
-    if (this.state === 'results') return { icon: 'thumbsUp', html: `<b>Thumbs up</b> or ${verb().toLowerCase()} to play again<small>Shake your head to go back</small>` };
+    if (this.state === 'results') return app.mode === 'camera'
+      ? { icon: 'thumbsUp', html: `<b>Thumbs up</b> or ${verb().toLowerCase()} to play again<small>Shake your head to go back</small>` }
+      : { icon: 'pinch', html: '<b>Click Play again</b> or press <b>Enter</b><small>Esc goes back Home</small>' };
     return this.playCoach();
   }
 
@@ -67,13 +72,13 @@ export class GameBase {
     this.combo++;
     this.bestCombo = Math.max(this.bestCombo, this.combo);
     if (this.combo % 5 === 0) {
-      app.fx.text(app.W / 2, app.H * 0.22, `Combo ×${this.mult}`, { color: this.accent, size: 30, dur: 1.4 });
+      app.fx.text(app.W / 2, comboY(), `Combo ×${this.mult}`, { color: this.accent, size: 30, dur: 1.4 });
       app.fx.flash(this.accent, 0.18);
       app.tapestry.ripple(app.W / 2, app.H / 2);
     }
   }
   breakCombo() {
-    if (this.combo >= 5) app.fx.text(app.W / 2, app.H * 0.22, 'combo lost', { color: '#b9b3ff', size: 15, font: 'Inter', weight: 500 });
+    if (this.combo >= 5) app.fx.text(app.W / 2, comboY(), 'combo lost', { color: '#b9b3ff', size: 15, font: 'Inter', weight: 500 });
     this.combo = 0;
   }
   loseLife(x, y) {
@@ -90,7 +95,7 @@ export class GameBase {
     if (app.overlays.active) return; // paused
     this.stateT += dt;
     if (this.state === 'intro') {
-      const start = this.stateT > 0.5 && inp.events.some((e) => (e.type === 'pinchStart' && e.primary) || START_EVENTS.has(e.type) || (e.type === 'cmd' && e.name === 'confirm'));
+      const start = this.stateT > 0.5 && inp.events.some((e) => (e.type === 'pinchStart' && e.primary) || START_EVENTS.has(e.type) || (e.type === 'blink' && e.key) || (e.type === 'cmd' && e.name === 'confirm'));
       if (this.stateT > ONBOARD_SECONDS || start) { this.state = 'play'; this.stateT = 0; app.audio.select(); this.onStart?.(); }
       return;
     }
@@ -137,7 +142,7 @@ export class GameBase {
   drawHud(ctx) {
     const W = app.W, acc = this.accent, Y = HUD_Y;
     glowText(ctx, fmt(this.score), W / 2, Y + 30, { size: 32, spacing: 1, glow: acc });
-    if (this.combo > 1) glowText(ctx, `${this.combo} chain · ×${this.mult}`, W / 2, Y + 60, { size: 12, font: 'Inter', weight: 600, spacing: 2, color: acc, blur: 8 });
+    if (this.combo > 1 && this.showChain !== false) glowText(ctx, `${this.combo} chain · ×${this.mult}`, W / 2, Y + 60, { size: 12, font: 'Inter', weight: 600, spacing: 2, color: acc, blur: 8 });
     if (Number.isFinite(this.duration)) {
       const p = clamp(this.time / this.duration), w = Math.min(W * 0.4, 420);
       ctx.save();
@@ -160,7 +165,8 @@ export class GameBase {
 
   /** The cue list, deriving from legacy rules when a game has none. */
   getCues() {
-    if (this.cues) return this.cues;
+    // A cue marked `cam` is a camera-only move (head tilt, two palms): mouse players just don't see it.
+    if (this.cues) return app.mode === 'camera' ? this.cues : this.cues.filter((c) => !c.cam);
     return this.rules.map(([icon]) => ({ cue: CUE_FOR_ICON[icon] || icon, key: '' }));
   }
 
@@ -198,8 +204,9 @@ export class GameBase {
     const W = app.W, H = app.H, pw = Math.min(520, W - 32), ph = 380, x = (W - pw) / 2, y = H / 2 - 210;
     const a = clamp(this.stateT * 2.5), r = this.result, acc = this.accent;
     // dim the paused game behind the panel so the results read cleanly
-    ctx.save(); ctx.fillStyle = `rgba(8, 6, 28, ${0.62 * a})`; ctx.fillRect(0, 0, W, H); ctx.restore();
-    glassPanel(ctx, x, y, pw, ph, { alpha: a, r: 28 });
+    // (frozen fruit, bombs and comets must never read as extra buttons between the orbs)
+    ctx.save(); ctx.fillStyle = `rgba(8, 6, 28, ${0.74 * a})`; ctx.fillRect(0, 0, W, H); ctx.restore();
+    glassPanel(ctx, x, y, pw, ph, { alpha: a, r: 28, fill: 0.9 });
     glowText(ctx, this.resultTitle?.() || 'ROUND COMPLETE', W / 2, y + 42, { size: 13, font: 'Inter', weight: 600, spacing: 4, alpha: a, color: acc, glow: acc });
     glowText(ctx, fmt(this.score), W / 2, y + 104, { size: 60, spacing: 1, alpha: a, blur: 30, glow: acc });
     const line2 = r.isBest && this.score > 0 ? 'NEW PERSONAL BEST' : `Personal best ${fmt(Math.max(r.prev, this.score))}`;

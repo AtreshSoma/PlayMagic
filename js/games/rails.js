@@ -27,6 +27,7 @@ const BUILDING_HUES = ['#ff7ad9', '#7ff3ff', '#ffd36e', '#b69bff', '#9dff9a'];
 export class RailsGame extends GameBase {
   constructor() {
     super('rails', 'Neon Rails');
+    this.showChain = false;
     this.duration = Infinity; this.maxLives = 3;
     this.allow = { swipe: false, runes: false, faceMagic: false, chimes: false, overlays: true, scatter: false, snapshot: false, gravity: false, puff: false, tilt: false, barrier: false, doubleBlink: false };
     this.cues = [{ cue: 'bodyStep', key: '← →' }, { cue: 'bodyJump', key: '↑ / Space' }, { cue: 'bodyCrouch', key: '↓ / S' }];
@@ -58,6 +59,8 @@ export class RailsGame extends GameBase {
     return { z, side: Math.random() < 0.5 ? -1 : 1, w: rand(0.6, 1.1), h: rand(0.9, 2.2), hue: pick(BUILDING_HUES), win: Math.random() * 1000, off: rand(0, 0.5) };
   }
 
+  /** Coins chain quietly here: the coin multiplier (status line) is the only "×" a player needs to read. */
+  hit() { this.combo++; this.bestCombo = Math.max(this.bestCombo, this.combo); }
   get mult() { return (1 + Math.min(4, Math.floor(this.coins / 50))) * (this.board > 0 ? 2 : 1); }
   get jumpH() { return this.jumpT > 0 ? Math.sin((1 - this.jumpT / JUMP_T) * Math.PI) : 0; }
   get sliding() { return this.slideT > 0; }

@@ -11,7 +11,13 @@ export class SceneManager {
   register(name, scene) { scene.name = name; this.map[name] = scene; }
 
   go(name, params = {}, { instant = false } = {}) {
-    if (this.trans) return;
+    // A request during a transition is never dropped (a dropped goHub left the tutorial frozen):
+    // while the iris closes it retargets; while it opens it runs right after.
+    if (this.trans) {
+      if (this.trans.phase === 'out') { this.trans.to = name; this.trans.params = params; }
+      else if (this.trans.to !== name || this.name !== name) this.queued = { name, params };
+      return;
+    }
     if (instant || !this.current) { this._switch(name, params); return; }
     this.trans = { to: name, params, t: 0, phase: 'out', x: params.fromX ?? app.W / 2, y: params.fromY ?? app.H / 2 };
     app.audio.portal();
@@ -32,7 +38,11 @@ export class SceneManager {
     if (tr) {
       tr.t += dt;
       if (tr.phase === 'out' && tr.t >= 0.45) { this._switch(tr.to, tr.params); tr.phase = 'in'; tr.t = 0; tr.x = app.W / 2; tr.y = app.H / 2; }
-      else if (tr.phase === 'in' && tr.t >= 0.55) this.trans = null;
+      else if (tr.phase === 'in' && tr.t >= 0.55) {
+        this.trans = null;
+        const q = this.queued; this.queued = null;
+        if (q && q.name !== this.name) this.go(q.name, q.params);
+      }
     }
     this.current?.update?.(dt);
   }

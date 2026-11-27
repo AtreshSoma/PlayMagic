@@ -261,7 +261,14 @@ body[data-scene="hub"] #home { opacity: 1; visibility: visible; pointer-events: 
 }
 .det-alt { margin: 12px 0 0; padding: 12px 16px; border-radius: 18px; background: rgba(255,255,255,.06); border: 1px solid var(--line); font-size: 14.5px; line-height: 1.4; color: var(--ink-soft); }
 .det-alt-k { display: block; margin-bottom: 3px; font-size: 12px; font-weight: 600; letter-spacing: .06em; text-transform: uppercase; color: var(--ink-soft); opacity: .8; }
-.det-actions { margin-top: auto; padding-top: 18px; display: flex; align-items: center; gap: 18px; flex-wrap: wrap; }
+/* Play is pinned under the scrolling text, so it is never cut off or below the fold */
+.det-foot { flex: 0 0 auto; padding: 14px 28px 18px; border-top: 1px solid var(--line); }
+.det-actions { display: flex; align-items: center; gap: 18px; flex-wrap: wrap; }
+.det-body, .grid { scrollbar-width: thin; scrollbar-color: rgba(255,255,255,.28) transparent; }
+.det-body::-webkit-scrollbar, .grid::-webkit-scrollbar { width: 10px; }
+.det-body::-webkit-scrollbar-thumb, .grid::-webkit-scrollbar-thumb { background: rgba(255,255,255,.25); border-radius: 10px; border: 2px solid transparent; background-clip: padding-box; }
+.det-body::-webkit-scrollbar-track, .grid::-webkit-scrollbar-track { background: transparent; }
+.det-body::-webkit-scrollbar-button, .grid::-webkit-scrollbar-button { display: none; height: 0; }
 .btn-play {
   all: unset; box-sizing: border-box; display: inline-flex; align-items: center; gap: 10px;
   height: 64px; padding: 0 36px 0 30px; border-radius: 99px;
@@ -316,10 +323,14 @@ body[data-scene="hub"] #home { opacity: 1; visibility: visible; pointer-events: 
 }
 @media (max-width: 560px) {
   .brand-sub { display: none; }
-  .cam-chip { padding: 8px 12px; font-size: 13px; }
+  .cam-chip { padding: 12px; font-size: 13px; }
+  /* phones: the camera chip shrinks to its status dot so it never covers the title (the text stays for screen readers) */
+  .cam-chip span { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; }
+  .brand-name { white-space: nowrap; }
   .grid { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 10px; }
   .card-meta { display: none; }
   .det-body { padding: 4px 18px 20px; }
+  .det-foot { padding: 12px 18px 16px; }
   .btn-play { height: 58px; font-size: 20px; }
 }
 @media (prefers-reduced-motion: reduce) {
@@ -357,6 +368,6 @@ body[data-scene="hub"] #home { opacity: 1; visibility: visible; pointer-events: 
 }
 .credit-k { font: 500 11px/1 var(--font); letter-spacing: .16em; text-transform: uppercase; opacity: .7; }
 .credit-n { font: 400 22px/1 'Great Vibes', cursive; color: rgba(253, 248, 255, .7); }
-.home-main { margin-bottom: 18px; }
+.home-main { margin-bottom: 30px; }
 @media (max-width: 900px) { .home-credit { position: static; justify-content: center; margin-top: 4px; } }
 @media (max-width: 560px) { .w-back span { display: none; } .w-back { padding: 10px 12px; } }

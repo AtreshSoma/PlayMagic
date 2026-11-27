@@ -79,11 +79,11 @@ export function roundRect(ctx, x, y, w, h, r) {
   ctx.arcTo(x, y + h, x, y, r); ctx.arcTo(x, y, x + w, y, r); ctx.closePath();
 }
 
-export function glassPanel(ctx, x, y, w, h, { r = 22, alpha = 1 } = {}) {
+export function glassPanel(ctx, x, y, w, h, { r = 22, alpha = 1, fill = 0.62 } = {}) {
   ctx.save();
   ctx.globalAlpha = alpha;
   roundRect(ctx, x, y, w, h, r);
-  ctx.fillStyle = 'rgba(10, 9, 32, 0.62)'; ctx.fill();
+  ctx.fillStyle = `rgba(10, 9, 32, ${fill})`; ctx.fill();
   const g = ctx.createLinearGradient(x, y, x + w * 0.4, y + h);
   g.addColorStop(0, 'rgba(255,255,255,0.10)'); g.addColorStop(1, 'rgba(255,255,255,0.0)');
   ctx.fillStyle = g; ctx.fill();

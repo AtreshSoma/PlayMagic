@@ -24,7 +24,7 @@ export class RunnerGame extends GameBase {
     super('runner', 'Starlight Run');
     this.duration = Infinity; this.maxLives = 3;
     this.allow = { swipe: false, runes: false, faceMagic: false, chimes: false, overlays: true, scatter: false, snapshot: false, gravity: false, puff: false, tilt: false, barrier: false };
-    this.cues = [{ cue: 'steer', key: '← →' }, { cue: 'flick', key: '↑' }, { cue: 'tilt', key: 'Mouse' }];
+    this.cues = [{ cue: 'steer', key: '← →' }, { cue: 'flick', key: '↑' }, { cue: 'tilt', cam: true }];
   }
 
   playCoach() {

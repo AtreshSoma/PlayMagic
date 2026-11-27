@@ -34,7 +34,7 @@ export class GestureGateGame extends GameBase {
     super('gate', 'Gesture Gate');
     this.duration = 75; this.maxLives = 5;
     this.allow = { swipe: false, runes: false, faceMagic: false, chimes: false, overlays: true, scatter: false, snapshot: false, doubleBlink: false, gravity: false };
-    this.cues = [{ cue: 'peace', key: 'P' }, { cue: 'fist', key: 'F' }, { cue: 'smile', key: '1' }];
+    this.cues = [{ cue: 'open', key: 'H' }, { cue: 'peace', key: 'P' }, { cue: 'fist', key: 'F' }, { cue: 'smile', key: '1' }];
     this.needsHand = false;
   }
 

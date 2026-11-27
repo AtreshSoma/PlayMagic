@@ -43,6 +43,7 @@ function drawSnack(ctx, kind, s, t) {
 export class MonsterMode {
   constructor() {
     this.palette = 'monster';
+    this.coachAt = 'top'; // keep the hint off the monster's face
     this.scenery = { islands: false };
     this.home = homeBubble(icon.home);
     this.mouthB = new Bubble({ id: 'mouth', hue: 300, icon: icon.mouth, momentary: true });

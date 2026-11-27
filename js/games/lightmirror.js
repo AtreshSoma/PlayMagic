@@ -35,7 +35,7 @@ export class LightMirrorGame extends GameBase {
     super('lightmirror', 'Light Mirror');
     this.duration = 90; this.maxLives = 0;
     this.allow = { swipe: false, runes: false, faceMagic: false, chimes: false, overlays: true, scatter: false, tilt: false, snapshot: false };
-    this.cues = [{ cue: 'tiltHand', key: 'Q / E' }, { cue: 'twoPalms', key: 'Move' }, { cue: 'pinch', key: 'Click' }];
+    this.cues = [{ cue: 'tiltHand', key: 'Q / E' }, { cue: 'twoPalms', cam: true }, { cue: 'pinch', key: 'Click' }];
   }
 
   playCoach() {

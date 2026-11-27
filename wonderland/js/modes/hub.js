@@ -79,6 +79,8 @@ export class HubMode {
             <p class="det-blurb"></p>
             <ol class="det-steps" aria-label="How to play"></ol>
             <p class="det-alt"><span class="det-alt-k"></span><span class="det-alt-v"></span></p>
+          </div>
+          <div class="det-foot">
             <div class="det-actions">
               <button type="button" class="btn-play" data-act="play">${PLAY_SVG}<span>Play</span></button>
               <p class="det-hint" aria-live="polite"></p>

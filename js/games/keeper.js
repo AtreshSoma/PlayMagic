@@ -21,7 +21,7 @@ export class KeeperGame extends GameBase {
     super('keeper', 'Comet Keeper');
     this.duration = 70; this.maxLives = 5;
     this.allow = { swipe: false, runes: false, faceMagic: false, chimes: false, overlays: true, scatter: false, snapshot: false, gravity: false, puff: false, tilt: false, barrier: false, doubleBlink: false };
-    this.cues = [{ cue: 'open', key: 'Move' }, { cue: 'twoPalms', key: 'Move' }, { cue: 'shake', key: '← →' }];
+    this.cues = [{ cue: 'open', key: 'Move' }, { cue: 'twoPalms', cam: true }, { cue: 'shake', key: '← →' }];
   }
 
   playCoach() {
@@ -79,13 +79,16 @@ export class KeeperGame extends GameBase {
       c.done = true;
       if (c.kind === 'dark') {
         const h = this.head();
-        if (dist(h.x, h.y, c.tx, c.ty) < h.r + 20) { this.loseLife(c.tx, c.ty - 60); app.audio.boom(0.7); app.fx.text(c.tx, c.ty - 90, 'Dodge the dark ones!', { color: '#c9a8ff', size: 16, font: 'Inter', weight: 700 }); }
+        if (dist(h.x, h.y, c.tx, c.ty) < h.r + 20 && elapsed < 8) { this.breakCombo(); app.audio.boom(0.5); app.fx.text(c.tx, c.ty - 90, 'Move away from the dark ones!', { color: '#c9a8ff', size: 16, font: 'Inter', weight: 700 }); }
+        else if (dist(h.x, h.y, c.tx, c.ty) < h.r + 20) { this.loseLife(c.tx, c.ty - 60); app.audio.boom(0.7); app.fx.text(c.tx, c.ty - 90, 'Dodge the dark ones!', { color: '#c9a8ff', size: 16, font: 'Inter', weight: 700 }); }
         else { this.score += 30 * this.mult; this.hit(); app.fx.text(c.tx, c.ty, `Dodged! +${30 * this.mult}`, { color: '#c9a8ff', size: 18 }); app.audio.whoosh(1); }
         continue;
       }
       const near = gloves.filter((g) => dist(g.x, g.y, c.tx, c.ty) < c.r * 1.15).length;
       const need = c.kind === 'gold' && app.mode === 'camera' && app.input.hands.filter((h) => h.present).length >= 2 ? 2 : 1;
       if (near >= need) this.block(c);
+      // Warm-up: the first few comets teach the ring without costing a light.
+      else if (elapsed < 8) { this.breakCombo(); app.audio.miss(); app.fx.text(c.tx, c.ty - 50, 'Reach the ring!', { color: '#ffffff', size: 16, font: 'Inter', weight: 700 }); }
       else { this.loseLife(c.tx, c.ty - 50); app.fx.flash('#ffffff', 0.15); }
     }
     this.comets = this.comets.filter((c) => !c.done || c.t < c.T + 0.4);
